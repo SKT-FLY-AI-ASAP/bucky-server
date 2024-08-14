@@ -1,8 +1,16 @@
 import uvicorn
 from fastapi import FastAPI
-from core.config import settings
+from config import settings
+from database import engineconn
 
 app = FastAPI()
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=settings.PORT)
+def check_connection():
+    engine = engineconn().engine
+    try:
+        with engine.begin() as connection:
+            print(f"DB connected. >>> {engine.url}")
+    except Exception as e:
+        print(f"DB connection failed.\n{e}")
+
+check_connection()
