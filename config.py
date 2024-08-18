@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     DB_PASSWORD: Optional[str] = None
     DB_NAME: Optional[str] = None
 
+    REDIS_HOST: Optional[str] = None
+    REDIS_PORT: Optional[int] = None
+    REDIS_DATABASE: Optional[int] = None
+
     class Config:
         env_file = Path(__file__).parent / '.env'
         env_file_encoding = 'utf-8'

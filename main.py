@@ -1,16 +1,12 @@
 from fastapi import FastAPI
 from database import engineconn
+from redis_config import redis_config
+
+from src.user.router import router as user_router
 
 app = FastAPI()
 engine = engineconn()
 session = engine.sessionmaker()
+rd = redis_config()
 
-def check_connection():
-    try:
-        with engine.engine.begin() as connection:
-            print(f"DB connected. >>> {engine.engine.url}")
-            engine.create_tables()
-    except Exception as e:
-        print(f"DB connection failed.\n{e}")
-
-check_connection()
+app.include_router(user_router)
