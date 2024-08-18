@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker
-from config import settings
-from base import Base
+from core.config import settings
+from core.base import Base
 from src.user.models import User
 
 DB_URL = f'mysql+pymysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}'

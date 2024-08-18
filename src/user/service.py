@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from .schemas import NewUserRequest, NewUserResponse
 from .models import User
 
-from redis_config import redis_config
+from core.redis_config import redis_config
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 rd = redis_config()

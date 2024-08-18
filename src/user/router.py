@@ -3,9 +3,9 @@ from starlette import status
 
 from .service import add_user
 
-from database import get_db
+from core.database import get_db
 from sqlalchemy.orm import Session
-from .schemas import NewUserRequest, NewUserResponse
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse
 
 # Router
 router = APIRouter(

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from database import engineconn
-from redis_config import redis_config
+from core.database import engineconn
+from core.redis_config import redis_config
 
 from src.user.router import router as user_router
 
