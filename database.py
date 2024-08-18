@@ -9,9 +9,15 @@ DB_URL = f'mysql+pymysql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.D
 class engineconn:
     def __init__(self):
         self.engine = create_engine(DB_URL, echo=True, pool_recycle=500)
+        try:
+            with self.engine.begin() as connection:
+                print(f"DB connected. >>> {self.engine.url}")
+                self.create_tables()
+        except Exception as e:
+            print(f"DB connection failed.\n{e}")
 
     def sessionmaker(self):
-        Session = sessionmaker(bind=self.engine)
+        Session = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
         session = Session()
         return session
 
@@ -22,3 +28,11 @@ class engineconn:
     def create_tables(self):
         print("Creating tables...")
         Base.metadata.create_all(bind=self.engine)
+
+# DB Session
+def get_db():
+    db = engineconn().sessionmaker()
+    try:
+        yield db
+    finally:
+        db.close()
