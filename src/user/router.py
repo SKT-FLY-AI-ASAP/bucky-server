@@ -20,7 +20,7 @@ router = APIRouter(
 def send_email_auth_link(db: Session = Depends(get_db), email: EmailAuthRequest = None):
     send_email(db, email_req=email)
 
-    return ResponseDto(message="Link sended.")
+    return ResponseDto(message="Link sent.")
 
 
 # Request email verification via link
@@ -42,7 +42,7 @@ def check_email(email_req: EmailAuthRequest):
 def validate_nickname(db: Session = Depends(get_db), nickname_req: NicknameValidRequest = None):
     validate_nickname(db, nickname_req=nickname_req)
 
-    return ResponseDto(message="Link sended.")
+    return ResponseDto(message="OK.")
 
 
 # Add new user

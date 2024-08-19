@@ -81,8 +81,8 @@ def validate_nickname(db: Session, nickname_req: NicknameValidRequest):
     user = db.query(User).filter(User.nickname == nickname_req.nickname)
     if user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Nickname validation required."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Nickname already exists."
         )
 
 
