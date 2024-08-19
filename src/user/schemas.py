@@ -1,5 +1,15 @@
 from pydantic import BaseModel, field_validator, EmailStr
 
+class EmailAuthRequest(BaseModel):
+    email: EmailStr
+
+    @field_validator('email')
+    def not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('Value required.')
+        return v
+
+
 class NewUserRequest(BaseModel):
     email: EmailStr
     password: str
@@ -25,10 +35,27 @@ class NewUserRequest(BaseModel):
             raise ValueError('Nickname is too long.')
         return v
 
+
 class NewUserResponse(BaseModel):
     user_id: int
+
 
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     user: str
+
+
+class EmailVerification(BaseModel):
+    code: str
+    verified: bool
+
+
+class NicknameValidRequest(BaseModel):
+    nickname: str
+
+    @field_validator('nickname')
+    def nickname_len(cls, v):
+        if len(v) > 8:
+            raise ValueError('Nickname is too long.')
+        return v
