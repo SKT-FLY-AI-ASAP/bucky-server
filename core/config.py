@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     REDIS_HOST: Optional[str] = None
     REDIS_PORT: Optional[int] = None
     REDIS_DATABASE: Optional[int] = None
+    REDIS_PASSWORD: Optional[str] = None
 
     MAIL_USERNAME: Optional[str] = None
     MAIL_PASSWORD: Optional[str] = None
