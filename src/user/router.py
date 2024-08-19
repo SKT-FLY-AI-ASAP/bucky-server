@@ -17,7 +17,9 @@ router = APIRouter(
 # Login
 @router.post("/session", response_model=DataResponseDto[TokenResponse], status_code=status.HTTP_201_CREATED)
 def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None):
-    return login(db, login_req=login_req)
+    data = login(db, login_req=login_req)
+
+    return DataResponseDto(data=data, message='OK.')
 
 
 # Request email verification link
