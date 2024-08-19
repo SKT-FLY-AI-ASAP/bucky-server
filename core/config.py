@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     MAIL_SERVER: Optional[str] = None
     MAIL_SUBJECT: Optional[str] = None
 
+    JWT_SECRET: Optional[str] = None
+
     class Config:
         env_file = Path(__file__).parent.parent / '.env'
         env_file_encoding = 'utf-8'
