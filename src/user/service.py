@@ -48,24 +48,6 @@ def logout(db: Session, authorization: str):
     return LogoutResponse(user_id=user.user_id)
 
 
-# Remove account
-def remove_account(db: Session, authorization: str):
-    # Decode header
-    token = decode_authorization_token(authorization=authorization)
-
-    # Decode token
-    user = decode_token(db=db, token=token)
-
-    # Remove session
-    rd.delete(f'{user.user_id}_refresh')
-
-    # Remove user data
-
-    # Remove user
-    db.delete(user)
-    db.commit()
-
-
 # Send email link
 def send_email(db: Session, email_req: EmailAuthRequest):
     # Check if email exists
@@ -189,3 +171,21 @@ def add_user(db: Session, new_user: NewUserRequest):
     print(f"New user {db_user.user_id} created.")
 
     return NewUserResponse(user_id=db_user.user_id)
+
+
+# Remove account
+def remove_account(db: Session, authorization: str):
+    # Decode header
+    token = decode_authorization_token(authorization=authorization)
+
+    # Decode token
+    user = decode_token(db=db, token=token)
+
+    # Remove session
+    rd.delete(f'{user.user_id}_refresh')
+
+    # Remove user data
+
+    # Remove user
+    db.delete(user)
+    db.commit()
