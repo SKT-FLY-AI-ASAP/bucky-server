@@ -11,6 +11,10 @@ class LoginRequest(BaseModel):
         return v
 
 
+class LogoutResponse(BaseModel):
+    user_id: int
+
+
 class EmailAuthRequest(BaseModel):
     email: EmailStr
 

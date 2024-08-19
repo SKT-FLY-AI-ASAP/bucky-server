@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from fastapi.responses import HTMLResponse
 from starlette import status
 
-from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login
+from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout
 
 from core.database import get_db
 from sqlalchemy.orm import Session
-from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest, LogoutResponse
 from core.schemas import ResponseDto, DataResponseDto
 
 # Router
@@ -18,6 +18,14 @@ router = APIRouter(
 @router.post("/session", response_model=DataResponseDto[TokenResponse], status_code=status.HTTP_201_CREATED)
 def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None):
     data = login(db, login_req=login_req)
+
+    return DataResponseDto(data=data, message='OK.')
+
+
+# Logout
+@router.delete("/session", response_model=DataResponseDto[LogoutResponse], status_code=status.HTTP_200_OK)
+def login_request(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
+    data = logout(db, authorization=Authorization)
 
     return DataResponseDto(data=data, message='OK.')
 
