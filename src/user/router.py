@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Header
 from fastapi.responses import HTMLResponse
 from starlette import status
 
-from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout
+from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account
 
 from core.database import get_db
 from sqlalchemy.orm import Session
@@ -66,3 +66,11 @@ def add_new_user(db: Session = Depends(get_db), new_user: NewUserRequest = None)
     res = add_user(db, new_user=new_user)
 
     return DataResponseDto(data=res, message="Created.")
+
+
+# Remove user
+@router.delete("", response_model=ResponseDto, status_code=status.HTTP_200_OK)
+def remove_user(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
+    remove_account(db, authorization=Authorization)
+
+    return ResponseDto(message="OK.")
