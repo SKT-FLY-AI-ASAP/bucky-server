@@ -13,6 +13,7 @@ def redis_config():
 
         rd.ping()
         print("Redis connected.")
+        return rd
 
     except:
         print("Redis connection failed.")
