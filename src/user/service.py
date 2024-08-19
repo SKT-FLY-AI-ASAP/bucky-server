@@ -1,7 +1,6 @@
 from fastapi import HTTPException, status
 import json
-
-from passlib.context import CryptContext
+import bcrypt
 
 from sqlalchemy.orm import Session
 from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, EmailVerification, LoginRequest, TokenResponse
@@ -12,7 +11,6 @@ from core.redis_config import redis_config
 
 from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template, generate_jwt
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 rd = redis_config()
 
 
@@ -27,7 +25,7 @@ def login(db: Session, login_req: LoginRequest):
         )
 
     # Validate password
-    if pwd_context.encrypt(login_req.password) != user.password:
+    if not bcrypt.checkpw((login_req.password).encode('utf-8'), (user.password).encode('utf-8')):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Password is wrong."
@@ -117,7 +115,8 @@ def validate_nickname(db: Session, nickname: str):
 def check_email_verification(email_req: str):
     # Check Redis
     rd_json = rd.get(email_req)
-    if not rd_json:
+    rd_data = json.loads(rd_json)
+    if not rd_json or not rd_data.get('verified'):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email verification required."
@@ -141,9 +140,13 @@ def add_user(db: Session, new_user: NewUserRequest):
             detail="Nickname validation required."
         )
 
+    # Encrypt password
+    salt = bcrypt.gensalt()
+    password_enc = bcrypt.hashpw((new_user.password).encode('utf-8'), salt)
+
     # Add user to db
     db_user = User(email=new_user.email,
-                   password=pwd_context.hash(new_user.password),
+                   password=password_enc,
                    nickname=new_user.nickname,
                    user_phone=new_user.phone,
                    user_address=new_user.address)
