@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Header
 from fastapi.responses import HTMLResponse
 from starlette import status
 
-from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account
+from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account, refresh_token
 
 from core.database import get_db
 from sqlalchemy.orm import Session
@@ -19,7 +19,7 @@ router = APIRouter(
 def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None):
     data = login(db, login_req=login_req)
 
-    return DataResponseDto(data=data, message='OK.')
+    return DataResponseDto(data=data, message='Created.')
 
 
 # Logout
@@ -74,3 +74,11 @@ def remove_user(db: Session = Depends(get_db), Authorization: str = Header(defau
     remove_account(db, authorization=Authorization)
 
     return ResponseDto(message="OK.")
+
+
+# Refresh token
+@router.get("/token", response_model=DataResponseDto[TokenResponse], status_code=status.HTTP_201_CREATED)
+def refresh_tokens(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
+    data = refresh_token(db=db, authorization=Authorization)
+
+    return DataResponseDto(data=data, message='Created.')

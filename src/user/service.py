@@ -189,3 +189,15 @@ def remove_account(db: Session, authorization: str):
     # Remove user
     db.delete(user)
     db.commit()
+
+
+# Refresh token
+def refresh_token(db: Session, authorization: str):
+    # Decode header
+    token = decode_authorization_token(authorization=authorization)
+
+    # Decode token
+    user = decode_token(db=db, token=token, is_access=False)
+
+    # Generate JWT
+    return generate_jwt(user=user)
