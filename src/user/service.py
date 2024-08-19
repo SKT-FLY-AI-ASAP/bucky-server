@@ -4,13 +4,13 @@ import json
 from passlib.context import CryptContext
 
 from sqlalchemy.orm import Session
-from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, EmailVerification, NicknameValidRequest
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, EmailVerification, LoginRequest, TokenResponse
 from .models import User
 
 from core.config import settings
 from core.redis_config import redis_config
 
-from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template
+from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template, generate_jwt
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 rd = redis_config()
@@ -76,9 +76,15 @@ def verify_link(email: str, code: str):
 
 
 # Validate nickname
-def validate_nickname(db: Session, nickname_req: NicknameValidRequest):
-    # Nickname validation
-    user = db.query(User).filter(User.nickname == nickname_req.nickname)
+def validate_nickname(db: Session, nickname: str):
+    # Nickname length validation
+    if len(nickname) > 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Nickname is too long."
+        )
+
+    user = db.query(User).filter(User.nickname == nickname).first()
     if user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -87,9 +93,9 @@ def validate_nickname(db: Session, nickname_req: NicknameValidRequest):
 
 
 # Check email verification
-def check_email_verification(email_req: EmailAuthRequest):
+def check_email_verification(email_req: str):
     # Check Redis
-    rd_json = rd.get(email_req.email)
+    rd_json = rd.get(email_req)
     if not rd_json:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -107,7 +113,7 @@ def add_user(db: Session, new_user: NewUserRequest):
         )
 
     # Nickname validation
-    user = db.query(User).filter(User.nickname == new_user.nickname)
+    user = db.query(User).filter(User.nickname == new_user.nickname).first()
     if user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
