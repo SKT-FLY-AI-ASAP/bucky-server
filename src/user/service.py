@@ -16,6 +16,27 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 rd = redis_config()
 
 
+# Login
+def login(db: Session, login_req: LoginRequest):
+    # Select user from db
+    user = db.query(User).filter(User.email == login_req.email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email does not exist."
+        )
+
+    # Validate password
+    if pwd_context.encrypt(login_req.password) != user.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Password is wrong."
+        )
+
+    # Generate JWT
+    return generate_jwt(user=user)
+
+
 # Send email link
 def send_email(db: Session, email_req: EmailAuthRequest):
     # Check if email exists

@@ -2,17 +2,22 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
 from starlette import status
 
-from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification
+from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login
 
 from core.database import get_db
 from sqlalchemy.orm import Session
-from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest
 from core.schemas import ResponseDto, DataResponseDto
 
 # Router
 router = APIRouter(
     prefix="/api/v1/user",
 )
+
+# Login
+@router.post("/session", response_model=DataResponseDto[TokenResponse], status_code=status.HTTP_201_CREATED)
+def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None):
+    return login(db, login_req=login_req)
 
 
 # Request email verification link
