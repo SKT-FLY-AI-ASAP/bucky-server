@@ -38,17 +38,17 @@ class NewUserRequest(BaseModel):
             raise ValueError('Value required.')
         return v
 
-    @field_validator('password')
-    def password_len(cls, v):
-        if len(v) < 10:
-            raise ValueError('Password is too short.')
-        return v
+    # @field_validator('password')
+    # def password_len(cls, v):
+    #     if len(v) < 10:
+    #         raise ValueError('Password is too short.')
+    #     return v
 
-    @field_validator('nickname')
-    def nickname_len(cls, v):
-        if len(v) > 8:
-            raise ValueError('Nickname is too long.')
-        return v
+    # @field_validator('nickname')
+    # def nickname_len(cls, v):
+    #     if len(v) > 8:
+    #         raise ValueError('Nickname is too long.')
+    #     return v
 
 
 class NewUserResponse(BaseModel):
