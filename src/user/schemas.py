@@ -1,4 +1,7 @@
 from pydantic import BaseModel, field_validator, EmailStr
+from starlette import status
+
+from core.exceptions import BaseCustomException
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -7,7 +10,10 @@ class LoginRequest(BaseModel):
     @field_validator('email', 'password')
     def not_empty(cls, v):
         if not v or not v.strip():
-            raise ValueError('Value required.')
+            raise BaseCustomException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Value required.'
+            )
         return v
 
 
@@ -21,7 +27,10 @@ class EmailAuthRequest(BaseModel):
     @field_validator('email')
     def not_empty(cls, v):
         if not v or not v.strip():
-            raise ValueError('Value required.')
+            raise BaseCustomException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Value required.'
+            )
         return v
 
 
@@ -35,19 +44,28 @@ class NewUserRequest(BaseModel):
     @field_validator('email', 'password', 'nickname', 'phone')
     def not_empty(cls, v):
         if not v or not v.strip():
-            raise ValueError('Value required.')
+            raise BaseCustomException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Value required.'
+            )
         return v
 
     # @field_validator('password')
     # def password_len(cls, v):
     #     if len(v) < 10:
-    #         raise ValueError('Password is too short.')
+    #         raise BaseCustomException(
+    #             status_code=status.HTTP_400_BAD_REQUEST,
+    #             detail='Password is too short.'
+    #         )
     #     return v
 
     # @field_validator('nickname')
     # def nickname_len(cls, v):
     #     if len(v) > 8:
-    #         raise ValueError('Nickname is too long.')
+    #         raise BaseCustomException(
+    #             status_code=status.HTTP_400_BAD_REQUEST,
+    #             detail='Nickname is too long.'
+    #         )
     #     return v
 
 
@@ -66,11 +84,14 @@ class EmailVerification(BaseModel):
     verified: bool
 
 
-# class NicknameValidRequest(BaseModel):
-#     nickname: str
+class NicknameValidRequest(BaseModel):
+    nickname: str
 
-#     @field_validator('nickname')
-#     def nickname_len(cls, v):
-#         if len(v) > 8:
-#             raise ValueError('Nickname is too long.')
-#         return v
+    # @field_validator('nickname')
+    # def nickname_len(cls, v):
+    #     if len(v) > 8:
+    #         raise BaseCustomException(
+    #             status_code=status.HTTP_400_BAD_REQUEST,
+    #             detail='Nickname is too long.'
+    #         )
+    #     return v
