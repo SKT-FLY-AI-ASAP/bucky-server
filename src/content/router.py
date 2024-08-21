@@ -7,7 +7,6 @@ from core.database import get_db
 from core.schemas import ResponseDto, DataResponseDto
 
 from .service import read_sketch_list
-from .schemas import SketchListResponse
 
 # Router
 router = APIRouter(
@@ -15,7 +14,7 @@ router = APIRouter(
 )
 
 # Read sketch list
-@router.get("/2d/list", response_model=DataResponseDto[SketchListResponse], status_code=status.HTTP_200_OK)
+@router.get("/2d/list", response_model=DataResponseDto[list], status_code=status.HTTP_200_OK)
 def get_sketch_list(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = read_sketch_list(db=db, authorization=Authorization)
 

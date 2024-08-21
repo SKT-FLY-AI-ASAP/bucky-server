@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 from .models import Sketch
 from .utils import datetime_to_str
@@ -18,6 +17,3 @@ class SketchItem(BaseModel):
         self.sketch_url = sketch.sketch_url
         self.created_at = datetime_to_str(sketch.created_at)
         self.updated_at = datetime_to_str(sketch.updated_at)
-
-class SketchListResponse(BaseModel):
-    sketch_list: List[SketchItem] = []
