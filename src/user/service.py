@@ -8,8 +8,9 @@ from .models import User
 
 from core.config import settings
 from core.redis_config import redis_config
+from core.utils import decode_authorization_token, decode_token
 
-from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template, generate_jwt, decode_authorization_token, decode_token
+from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template, generate_jwt
 
 rd = redis_config()
 
