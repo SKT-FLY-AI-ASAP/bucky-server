@@ -9,7 +9,6 @@ class ResponseDto(BaseModel):
 
 class DataResponseDto(BaseModel, Generic[T]):
     data: Optional[T]
-    message: str
 
     class Config:
         from_attributes = True

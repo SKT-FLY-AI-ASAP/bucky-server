@@ -19,7 +19,7 @@ router = APIRouter(
 def get_sketch_list(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = read_sketch_list(db=db, authorization=Authorization)
 
-    return DataResponseDto(data=data, message='OK.')
+    return DataResponseDto(data=data)
 
 
 # @router.post("/2d", response_model=DataResponseDto[NewSketchResponse], status_code=status.HTTP_201_CREATED)

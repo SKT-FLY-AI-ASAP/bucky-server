@@ -19,7 +19,7 @@ router = APIRouter(
 def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None):
     data = login(db, login_req=login_req)
 
-    return DataResponseDto(data=data, message='Created.')
+    return DataResponseDto(data=data)
 
 
 # Logout
@@ -27,7 +27,7 @@ def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None)
 def login_request(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = logout(db, authorization=Authorization)
 
-    return DataResponseDto(data=data, message='OK.')
+    return DataResponseDto(data=data)
 
 
 # Request email verification link
@@ -65,7 +65,7 @@ def check_nickname(db: Session = Depends(get_db), nickname: str = None):
 def add_new_user(db: Session = Depends(get_db), new_user: NewUserRequest = None):
     res = add_user(db, new_user=new_user)
 
-    return DataResponseDto(data=res, message="Created.")
+    return DataResponseDto(data=res)
 
 
 # Remove user
@@ -81,4 +81,4 @@ def remove_user(db: Session = Depends(get_db), Authorization: str = Header(defau
 def refresh_tokens(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = refresh_token(db=db, authorization=Authorization)
 
-    return DataResponseDto(data=data, message='Created.')
+    return DataResponseDto(data=data)
