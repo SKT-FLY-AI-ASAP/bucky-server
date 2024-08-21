@@ -14,6 +14,7 @@ class Sketch(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True))
     removed_at = Column(DateTime(timezone=True))
+    content_id = Column(BigInteger)
     user_id = Column(BigInteger, ForeignKey('user.user_id'))
 
     user = relationship('User', back_populates='sketch')
