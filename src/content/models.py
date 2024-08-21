@@ -8,8 +8,9 @@ class Sketch(Base):
     __tablename__ = "sketch"
 
     sketch_id = Column(BigInteger, primary_key=True, nullable=False, autoincrement=True)
-    email = Column(String(50), nullable=False)
-    is_removed = Column(Boolean)
+    sketch_title = Column(String(50), nullable=False)
+    sketch_url = Column(String(256), nullable=False)
+    is_removed = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True))
     removed_at = Column(DateTime(timezone=True))
