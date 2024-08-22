@@ -1,9 +1,10 @@
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from starlette import status
 from fastapi import File
 from datetime import datetime
 
-from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem
+from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem, ContentItem
 from .models import Sketch, Content, Design
 from .utils import add_to_s3, check_file_extension
 
@@ -93,3 +94,44 @@ def read_content_list(db: Session, authorization: str):
     content_list = [ContentListItem(item) for item in content_list]
 
     return content_list
+
+
+# 3D Content item (장난감 상자)
+def read_content_item(db: Session, authorization: str, id: int):
+    # Decode access token
+    user = decode_access_token(db=db, authorization=authorization)
+
+    # Read content data
+    content = db.query(Content).filter(
+        and_(
+            Content.content_id == id,
+            Content.is_removed == False
+        )
+    ).first()
+
+    # Validation
+    if not content:
+        raise BaseCustomException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Content not found.'
+        )
+    elif content.user_id != user.user_id:
+        raise BaseCustomException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Data access denied.'
+        )
+
+    # Find design data
+    design = db.query(Design).filter(
+        and_(
+            Design.content_id == content.content_id,
+            Design.is_removed == False
+        )
+    ).first()
+
+    if not design:
+        url = None
+    else:
+        url = design.design_url
+
+    return ContentItem(content=content, design=url)

@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from core.database import get_db
 from core.schemas import ResponseDto, DataResponseDto
 
-from .service import read_sketch_list, read_sketch_item, add_new_sketch, read_content_list
-from .schemas import SketchItem, NewSketchResponse
+from .service import read_sketch_list, read_sketch_item, add_new_sketch, read_content_list, read_content_item
+from .schemas import SketchItem, NewSketchResponse, ContentItem
 
 # Router
 router = APIRouter(
@@ -43,5 +43,13 @@ def post_new_sketch(db: Session = Depends(get_db), Authorization: str = Header(d
 @router.get("/3d/list", response_model=DataResponseDto[list], status_code=status.HTTP_200_OK)
 def get_content_list(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = read_content_list(db=db, authorization=Authorization)
+
+    return DataResponseDto(data=data)
+
+
+# 3D Content item (장난감 상자)
+@router.get("/3d/{id}", response_model=DataResponseDto[ContentItem], status_code=status.HTTP_200_OK)
+def get_content_item(db: Session = Depends(get_db), Authorization: str = Header(default=None), id: int = 0):
+    data = read_content_item(db=db, authorization=Authorization, id=id)
 
     return DataResponseDto(data=data)
