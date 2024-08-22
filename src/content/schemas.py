@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 from .models import Sketch
 from .utils import datetime_to_str
@@ -18,6 +19,7 @@ class SketchListItem(BaseModel):
         self.created_at = datetime_to_str(sketch.created_at)
         self.updated_at = datetime_to_str(sketch.updated_at)
 
+
 class SketchItem(BaseModel):
     sketch_id: int = None
     sketch_title: str = None
@@ -34,3 +36,9 @@ class SketchItem(BaseModel):
         self.content_id = sketch.content_id
         self.created_at = datetime_to_str(sketch.created_at)
         self.updated_at = datetime_to_str(sketch.updated_at)
+
+
+class NewSketchResponse(BaseModel):
+    sketch_id: Optional[int] = None
+    sketch_title: Optional[str] = None
+    sketch_url: Optional[str] = None
