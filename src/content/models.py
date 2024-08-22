@@ -37,7 +37,7 @@ class Content(Base):
 
     user = relationship('User', back_populates='content')
 
-User.content = relationship('Content', back_populates='content')
+User.content = relationship('Content', back_populates='user')
 
 
 class Design(Base):
@@ -53,4 +53,4 @@ class Design(Base):
 
     content = relationship('Content', back_populates='design')
 
-Content.design = relationship('Design', back_populates='design')
+Content.design = relationship('Design', back_populates='content')

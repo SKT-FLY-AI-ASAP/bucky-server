@@ -3,8 +3,8 @@ from starlette import status
 from fastapi import File
 from datetime import datetime
 
-from .schemas import SketchListItem, SketchItem, NewSketchResponse
-from .models import Sketch
+from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem
+from .models import Sketch, Content, Design
 from .utils import add_to_s3, check_file_extension
 
 from core.utils import decode_access_token
@@ -81,3 +81,15 @@ def add_new_sketch(db: Session, authorization: str, title: str, file: File):
     return NewSketchResponse(sketch_id=db_sketch.sketch_id,
                              sketch_title=db_sketch.sketch_title,
                              sketch_url=db_sketch.sketch_url)
+
+
+# 3D Content list (장난감 상자)
+def read_content_list(db: Session, authorization: str):
+    # Decode access token
+    user = decode_access_token(db=db, authorization=authorization)
+
+    # Read content data
+    content_list = db.query(Content).filter(Content.user_id == user.user_id).all()
+    content_list = [ContentListItem(item) for item in content_list]
+
+    return content_list
