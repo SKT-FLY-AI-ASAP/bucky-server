@@ -26,6 +26,10 @@ class Settings(BaseSettings):
 
     JWT_SECRET: Optional[str] = None
 
+    S3_ACCESS_KEY: Optional[str] = None
+    S3_PRIVATE_KEY: Optional[str] = None
+    S3_BUCKET_NAME: Optional[str] = None
+
     class Config:
         env_file = Path(__file__).parent.parent / '.env'
         env_file_encoding = 'utf-8'
