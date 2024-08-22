@@ -90,7 +90,12 @@ def read_content_list(db: Session, authorization: str):
     user = decode_access_token(db=db, authorization=authorization)
 
     # Read content data
-    content_list = db.query(Content).filter(Content.user_id == user.user_id).all()
+    content_list = db.query(Content).filter(
+        and_(
+            Content.user_id == user.user_id,
+            Content.content_type == False
+        )
+    ).all()
     content_list = [ContentListItem(item) for item in content_list]
 
     return content_list
