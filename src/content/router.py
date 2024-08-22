@@ -48,8 +48,16 @@ def get_content_list(db: Session = Depends(get_db), Authorization: str = Header(
 
 
 # 3D Content item (장난감 상자)
-@router.get("/3d/{id}", response_model=DataResponseDto[ContentItem], status_code=status.HTTP_200_OK)
+@router.get("/{id}", response_model=DataResponseDto[ContentItem], status_code=status.HTTP_200_OK)
 def get_content_item(db: Session = Depends(get_db), Authorization: str = Header(default=None), id: int = 0):
     data = read_content_item(db=db, authorization=Authorization, id=id)
+
+    return DataResponseDto(data=data)
+
+
+# STT Content list (주문 외우기)
+@router.get("/stt/list", response_model=DataResponseDto[list], status_code=status.HTTP_200_OK)
+def get_content_list(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
+    data = read_content_list(db=db, authorization=Authorization, is_stt=True)
 
     return DataResponseDto(data=data)

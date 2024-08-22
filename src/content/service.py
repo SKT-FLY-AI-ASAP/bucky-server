@@ -4,7 +4,7 @@ from starlette import status
 from fastapi import File
 from datetime import datetime
 
-from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem, ContentItem
+from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem, ContentItem, NewSTTRequest
 from .models import Sketch, Content, Design
 from .utils import add_to_s3, check_file_extension
 
@@ -85,7 +85,7 @@ def add_new_sketch(db: Session, authorization: str, title: str, file: File):
 
 
 # 3D Content list (장난감 상자)
-def read_content_list(db: Session, authorization: str):
+def read_content_list(db: Session, authorization: str, is_stt: bool = False):
     # Decode access token
     user = decode_access_token(db=db, authorization=authorization)
 
@@ -93,7 +93,7 @@ def read_content_list(db: Session, authorization: str):
     content_list = db.query(Content).filter(
         and_(
             Content.user_id == user.user_id,
-            Content.content_type == False
+            Content.content_type == is_stt
         )
     ).all()
     content_list = [ContentListItem(item) for item in content_list]
@@ -140,3 +140,7 @@ def read_content_item(db: Session, authorization: str, id: int):
         url = design.design_url
 
     return ContentItem(content=content, design=url)
+
+
+# # New stt content (주문 외우기)
+# def add_new_stt_content(db: Session, authorization: str, stt_req:NewSTTRequest):
