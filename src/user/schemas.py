@@ -3,6 +3,8 @@ from starlette import status
 
 from core.exceptions import BaseCustomException
 
+from .models import User
+
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
@@ -95,3 +97,9 @@ class NicknameValidRequest(BaseModel):
     #             detail='Nickname is too long.'
     #         )
     #     return v
+
+
+class UserInfoResponse(BaseModel):
+    user_id: int
+    email: str
+    nickname: str

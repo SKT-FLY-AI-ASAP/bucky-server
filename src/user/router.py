@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, Header
 from fastapi.responses import HTMLResponse
 from starlette import status
 
-from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account, refresh_token
+from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account, refresh_token, get_user_info
 
 from core.database import get_db
 from sqlalchemy.orm import Session
-from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest, LogoutResponse
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest, LogoutResponse, UserInfoResponse
 from core.schemas import ResponseDto, DataResponseDto
 
 # Router
@@ -80,5 +80,13 @@ def remove_user(db: Session = Depends(get_db), Authorization: str = Header(defau
 @router.get("/token", response_model=DataResponseDto[TokenResponse], status_code=status.HTTP_201_CREATED)
 def refresh_tokens(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = refresh_token(db=db, authorization=Authorization)
+
+    return DataResponseDto(data=data)
+
+
+# User info
+@router.get("/info", response_model=DataResponseDto[UserInfoResponse], status_code=status.HTTP_200_OK)
+def read_user_info(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
+    data = get_user_info(db=db, authorization=Authorization)
 
     return DataResponseDto(data=data)
