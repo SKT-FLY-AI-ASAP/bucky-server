@@ -29,6 +29,8 @@ class Content(Base):
     content_title = Column(String(50), nullable=False)
     content_type = Column(Boolean, default=False)
     content_url = Column(String(256), nullable=False)
+    content_bg_url = Column(String(256), nullable=False)
+    thumbnail_url = Column(String(256), nullable=False)
     is_removed = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True))

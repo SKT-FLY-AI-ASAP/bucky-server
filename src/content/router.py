@@ -6,8 +6,9 @@ from sqlalchemy.orm import Session
 from core.database import get_db
 from core.schemas import ResponseDto, DataResponseDto
 
-from .service import read_sketch_list, read_sketch_item, add_new_sketch, read_content_list, read_content_item
-from .schemas import SketchItem, NewSketchResponse, ContentItem
+from .service import read_sketch_list, read_sketch_item, add_new_sketch, read_content_list, read_content_item, gen_content
+from .schemas import SketchItem, NewSketchResponse, ContentItem, ContentRequest, STTRequest
+from .aiml.schemas import ModelResponse
 
 # Router
 router = APIRouter(
@@ -59,5 +60,21 @@ def get_content_item(db: Session = Depends(get_db), Authorization: str = Header(
 @router.get("/stt/list", response_model=DataResponseDto[list], status_code=status.HTTP_200_OK)
 def get_content_list(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = read_content_list(db=db, authorization=Authorization, is_stt=True)
+
+    return DataResponseDto(data=data)
+
+
+# Generate 3D Content from sketch
+@router.post("/2d/3d", response_model=DataResponseDto[ModelResponse], status_code=status.HTTP_201_CREATED)
+def generate_content(db: Session = Depends(get_db), Authorization: str = Header(default=None), req: ContentRequest = None):
+    data = gen_content(db=db, authorization=Authorization, sketch_req=req)
+
+    return DataResponseDto(data=data)
+
+
+# Generate 3D Content from text
+@router.post("/stt/3d", response_model=DataResponseDto[ModelResponse], status_code=status.HTTP_201_CREATED)
+def generate_content(db: Session = Depends(get_db), Authorization: str = Header(default=None), req: STTRequest = None):
+    data = gen_content(db=db, authorization=Authorization, stt_req=req)
 
     return DataResponseDto(data=data)

@@ -4,9 +4,12 @@ from starlette import status
 from fastapi import File
 from datetime import datetime
 
-from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem, ContentItem, NewSTTRequest
+from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem, ContentItem, ContentRequest, STTRequest
 from .models import Sketch, Content, Design
 from .utils import add_to_s3, check_file_extension
+
+from .aiml.service import get_content_aiml
+from .aiml.schemas import ModelRequest
 
 from core.utils import decode_access_token
 from core.exceptions import BaseCustomException
@@ -142,5 +145,60 @@ def read_content_item(db: Session, authorization: str, id: int):
     return ContentItem(content=content, design=url)
 
 
-# # New stt content (주문 외우기)
-# def add_new_stt_content(db: Session, authorization: str, stt_req:NewSTTRequest):
+# New content
+def gen_content(db: Session, authorization: str, sketch_req: ContentRequest = None, stt_req: STTRequest = None):
+    # Decode access token
+    user = decode_access_token(db=db, authorization=authorization)
+
+    # Current time
+    current_time = datetime.now().strftime('%Y%m%dT%H:%M:%S')
+
+    # Check req type
+    if not sketch_req:
+        # Read sketch data
+        sketch = db.query(Sketch).filter(Sketch.sketch_id == sketch_req.sketch_id).first()
+
+        # Validation
+        if not sketch:
+            raise BaseCustomException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Sketch not found.'
+            )
+        elif sketch.user_id != user.user_id:
+            raise BaseCustomException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Data access denied.'
+            )
+
+        req = ModelRequest(user_id=user.user_id, title=f'sketch_{current_time}', image_url=sketch.sketch_url)
+        title = sketch_req.title
+    else:
+        req = ModelRequest(user_id=user.user_id, title=f'stt_{current_time}', prompt=stt_req.prompt)
+        title = stt_req.title
+
+    # Request ai-ml
+    data = get_content_aiml(req=req)
+
+    # Add content to DB
+    db_content = Content(
+        content_title=title,
+        content_type=False,
+        content_url=data.glb_url,
+        content_bg_url=data.glb_bg_url,
+        thumbnail_url=data.thumbnail_url,
+        user_id=user.user_id
+    )
+    db.add(db_content)
+    db.commit()
+    db.refresh(db_content)
+
+    # Add design to DB
+    db_design = Design(
+        design_url=data.stl_url,
+        content_id=db_content.content_id
+    )
+    db.add(db_design)
+    db.commit()
+    db.refresh(db_design)
+
+    return ContentItem(content=db_content, design=db_design.design_url)
