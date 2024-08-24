@@ -5,6 +5,7 @@ from pathlib import Path
 class Settings(BaseSettings):
     PORT: Optional[int] = None
     BASE_URL: Optional[str] = None
+    ICON_URL: Optional[str] = None
 
     DB_HOST: Optional[str] = None
     DB_PORT: Optional[int] = None
@@ -29,6 +30,8 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: Optional[str] = None
     S3_PRIVATE_KEY: Optional[str] = None
     S3_BUCKET_NAME: Optional[str] = None
+
+    AI_BASE_URL: Optional[str] = None
 
     class Config:
         env_file = Path(__file__).parent.parent / '.env'

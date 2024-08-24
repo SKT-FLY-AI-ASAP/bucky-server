@@ -19,6 +19,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 jwt_secret = settings.JWT_SECRET
+ICON_URL = settings.ICON_URL
 
 # Generate JWT
 def generate_jwt(user: User):
@@ -79,7 +80,7 @@ def send_email_verif_link(recipient: str, verif_link: str):
     template = template_env.get_template('email_verification.html')
 
     # Render template with data
-    html_content = template.render(link=verif_link)
+    html_content = template.render(icon=ICON_URL, link=verif_link)
 
     # Configure email
     msg = MIMEMultipart('alternative')
@@ -108,6 +109,6 @@ def get_email_verif_complete_template():
     template = template_env.get_template('verification_res.html')
 
     # Render template with data
-    content = template.render()
+    content = template.render(icon=ICON_URL)
 
     return HTMLResponse(content=content, status_code=status.HTTP_200_OK)
