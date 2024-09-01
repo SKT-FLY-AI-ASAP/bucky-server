@@ -33,9 +33,9 @@ def get_sketch_item(db: Session = Depends(get_db), Authorization: str = Header(d
 
 # Add new sketch
 @router.post("/2d", response_model=DataResponseDto[NewSketchResponse], status_code=status.HTTP_201_CREATED)
-def post_new_sketch(db: Session = Depends(get_db), Authorization: str = Header(default=None),
-                    title: str = Form(...), file: UploadFile = File(...)):
-    data = add_new_sketch(db=db, authorization=Authorization, title=title, file=file)
+async def post_new_sketch(db: Session = Depends(get_db), Authorization: str = Header(default=None),
+                          title: str = Form(...), file: UploadFile = File(...)):
+    data = await add_new_sketch(db=db, authorization=Authorization, title=title, file=file)
 
     return DataResponseDto(data=data)
 
@@ -65,16 +65,16 @@ def get_content_list(db: Session = Depends(get_db), Authorization: str = Header(
 
 
 # Generate 3D Content from sketch
-@router.post("/2d/3d", response_model=DataResponseDto[ModelResponse], status_code=status.HTTP_201_CREATED)
-def generate_content(db: Session = Depends(get_db), Authorization: str = Header(default=None), req: ContentRequest = None):
-    data = gen_content(db=db, authorization=Authorization, sketch_req=req)
+@router.post("/2d/3d", response_model=DataResponseDto[ContentItem], status_code=status.HTTP_201_CREATED)
+async def generate_content(db: Session = Depends(get_db), Authorization: str = Header(default=None), req: ContentRequest = None):
+    data = await gen_content(db=db, authorization=Authorization, sketch_req=req)
 
     return DataResponseDto(data=data)
 
 
 # Generate 3D Content from text
-@router.post("/stt/3d", response_model=DataResponseDto[ModelResponse], status_code=status.HTTP_201_CREATED)
-def generate_content(db: Session = Depends(get_db), Authorization: str = Header(default=None), req: STTRequest = None):
-    data = gen_content(db=db, authorization=Authorization, stt_req=req)
+@router.post("/stt/3d", response_model=DataResponseDto[ContentItem], status_code=status.HTTP_201_CREATED)
+async def generate_content(db: Session = Depends(get_db), Authorization: str = Header(default=None), req: STTRequest = None):
+    data = await gen_content(db=db, authorization=Authorization, stt_req=req)
 
     return DataResponseDto(data=data)

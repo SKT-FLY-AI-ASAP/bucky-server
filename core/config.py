@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: Optional[str] = None
     S3_PRIVATE_KEY: Optional[str] = None
     S3_BUCKET_NAME: Optional[str] = None
+    S3_REGION_NAME: Optional[str] = None
 
     AI_BASE_URL: Optional[str] = None
 

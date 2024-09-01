@@ -6,6 +6,7 @@ from core.exceptions import generic_exception_handler, BaseCustomException, base
 
 from src.user.router import router as user_router
 from src.content.router import router as content_router
+from src.content.aiml.router import router as aiml_router
 
 app = FastAPI()
 engine = engineconn()
@@ -19,3 +20,4 @@ app.add_exception_handler(BaseCustomException, base_custom_exception_handler)
 # Router
 app.include_router(user_router)
 app.include_router(content_router)
+app.include_router(aiml_router)

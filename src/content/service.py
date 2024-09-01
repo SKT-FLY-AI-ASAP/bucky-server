@@ -1,7 +1,7 @@
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from starlette import status
-from fastapi import File
+from fastapi import File, UploadFile
 from datetime import datetime
 
 from .schemas import SketchListItem, SketchItem, NewSketchResponse, ContentListItem, ContentItem, ContentRequest, STTRequest
@@ -9,10 +9,12 @@ from .models import Sketch, Content, Design
 from .utils import add_to_s3, check_file_extension
 
 from .aiml.service import get_content_aiml
-from .aiml.schemas import ModelRequest
+from .aiml.schemas import ModelRequest, ModelResponse
 
 from core.utils import decode_access_token
 from core.exceptions import BaseCustomException
+from core.config import settings
+
 
 # Sketch List
 def read_sketch_list(db: Session, authorization: str):
@@ -50,7 +52,7 @@ def read_sketch_item(db: Session, authorization: str, id: int):
 
 
 # New sketch
-def add_new_sketch(db: Session, authorization: str, title: str, file: File):
+async def add_new_sketch(db: Session, authorization: str, title: str, file: UploadFile):
     # Decode access token
     user = decode_access_token(db=db, authorization=authorization)
 
@@ -70,7 +72,9 @@ def add_new_sketch(db: Session, authorization: str, title: str, file: File):
 
     # Add file to S3
     current_time = datetime.now().strftime('%Y%m%dT%H:%M:%S')
-    url = add_to_s3(object_name=f'sketches/{user.user_id}-{title}-{current_time}.png', file=file)
+    url = await add_to_s3(object_name=f'sketches/{user.user_id}-{title}-{current_time}.png', file=file)
+
+    print(url)
 
     # Add sketch data
     db_sketch = Sketch(sketch_title=title,
@@ -146,15 +150,18 @@ def read_content_item(db: Session, authorization: str, id: int):
 
 
 # New content
-def gen_content(db: Session, authorization: str, sketch_req: ContentRequest = None, stt_req: STTRequest = None):
+async def gen_content(db: Session, authorization: str, sketch_req: ContentRequest = None, stt_req: STTRequest = None):
     # Decode access token
     user = decode_access_token(db=db, authorization=authorization)
 
     # Current time
     current_time = datetime.now().strftime('%Y%m%dT%H:%M:%S')
 
+    is_sketch = False
+
     # Check req type
-    if not sketch_req:
+    if stt_req is None:
+        is_sketch = True
         # Read sketch data
         sketch = db.query(Sketch).filter(Sketch.sketch_id == sketch_req.sketch_id).first()
 
@@ -177,15 +184,16 @@ def gen_content(db: Session, authorization: str, sketch_req: ContentRequest = No
         title = stt_req.title
 
     # Request ai-ml
-    data = get_content_aiml(req=req)
+    data = await get_content_aiml(req=req)
 
     # Add content to DB
     db_content = Content(
         content_title=title,
-        content_type=False,
+        content_type=is_sketch,
         content_url=data.glb_url,
-        content_bg_url=data.glb_bg_url,
-        thumbnail_url=data.thumbnail_url,
+        content_bg_url=data.bg_png_url,
+        content_bgm_url=data.mp3_url,
+        thumbnail_url=data.png_url,
         user_id=user.user_id
     )
     db.add(db_content)

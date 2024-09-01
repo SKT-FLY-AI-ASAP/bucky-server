@@ -70,6 +70,7 @@ class ContentItem(BaseModel):
     content_title: str = None
     content_url: str = None
     content_bg_url: str = None
+    content_bgm_url: str = None
     design_url: str = None
     created_at: str = None
     updated_at: str = None
@@ -80,6 +81,7 @@ class ContentItem(BaseModel):
         self.content_title = content.content_title
         self.content_url = content.content_url
         self.content_bg_url = content.content_bg_url
+        self.content_bgm_url = content.content_bgm_url
         self.design_url = design
         self.created_at = datetime_to_str(content.created_at)
         self.updated_at = datetime_to_str(content.updated_at)
@@ -89,7 +91,16 @@ class ContentRequest(BaseModel):
     sketch_id: int = None
     title: str = None
 
-    @field_validator('sketch_id', 'title')
+    @field_validator('sketch_id')
+    def not_empty(cls, v):
+        if not v:
+            raise BaseCustomException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Value required.'
+            )
+        return v
+
+    @field_validator('title')
     def not_empty(cls, v):
         if not v or not v.strip():
             raise BaseCustomException(
