@@ -4,8 +4,6 @@ from fastapi.responses import HTMLResponse
 from starlette import status
 import jwt
 
-from sqlalchemy.orm import Session
-
 import string
 import random
 import datetime
@@ -15,13 +13,13 @@ from core.redis_config import redis_config
 
 from .models import User
 from .schemas import TokenResponse
-from core.exceptions import BaseCustomException
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 jwt_secret = settings.JWT_SECRET
+ICON_URL = settings.ICON_URL
 
 # Generate JWT
 def generate_jwt(user: User):
@@ -55,70 +53,6 @@ def generate_jwt(user: User):
     return TokenResponse(access_token=access_token, refresh_token=refresh_token, user_id=user.user_id)
 
 
-# Decode authorization token
-def decode_authorization_token(authorization: str):
-    # Check if token exists
-    if not authorization:
-        raise ValueError("Token required.")
-
-    # Check bearer
-    if not authorization.startswith('Bearer '):
-        raise ValueError("Invalid token.")
-
-    token = authorization[len('Bearer '):]
-    return token
-
-
-# Decode token
-def decode_token(db: Session, token: str, is_access: bool = True):
-    if is_access:
-        token_type = 'access_token'
-    else:
-        token_type = 'refresh_token'
-
-    # Read payload
-    try:
-        payload = jwt.decode(token, jwt_secret, algorithms=['HS256'])
-    except jwt.ExpiredSignatureError:
-        raise BaseCustomException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token expired."
-        )
-    except jwt.InvalidTokenError:
-        raise BaseCustomException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token."
-        )
-
-    # Check type
-    if payload['type'] != token_type:
-        raise BaseCustomException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token."
-        )
-
-    # Find user from DB
-    user = db.query(User).filter(User.user_id == payload['user_id']).first()
-
-    # Check payload and user
-    if not user:
-        raise BaseCustomException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authorization failed."
-        )
-
-    # Check Redis (Session)
-    rd = redis_config()
-    rd_refresh = rd.get(f'{user.user_id}_refresh')
-    if not rd_refresh:
-        raise BaseCustomException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Login required."
-        )
-
-    return user
-
-
 # Generate random code
 def generate_random_code(length=15):
     # 사용할 문자 집합 정의
@@ -146,7 +80,7 @@ def send_email_verif_link(recipient: str, verif_link: str):
     template = template_env.get_template('email_verification.html')
 
     # Render template with data
-    html_content = template.render(link=verif_link)
+    html_content = template.render(icon=ICON_URL, link=verif_link)
 
     # Configure email
     msg = MIMEMultipart('alternative')
@@ -175,6 +109,6 @@ def get_email_verif_complete_template():
     template = template_env.get_template('verification_res.html')
 
     # Render template with data
-    content = template.render()
+    content = template.render(icon=ICON_URL)
 
     return HTMLResponse(content=content, status_code=status.HTTP_200_OK)

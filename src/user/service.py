@@ -3,13 +3,14 @@ import json
 import bcrypt
 
 from sqlalchemy.orm import Session
-from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, EmailVerification, LoginRequest, LogoutResponse
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, EmailVerification, LoginRequest, LogoutResponse, UserInfoResponse
 from .models import User
 
 from core.config import settings
 from core.redis_config import redis_config
+from core.utils import decode_authorization_token, decode_token, decode_access_token
 
-from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template, generate_jwt, decode_authorization_token, decode_token
+from .utils import send_email_verif_link, generate_random_code, get_email_verif_complete_template, generate_jwt
 
 rd = redis_config()
 
@@ -201,3 +202,11 @@ def refresh_token(db: Session, authorization: str):
 
     # Generate JWT
     return generate_jwt(user=user)
+
+
+# Read user info
+def get_user_info(db: Session, authorization: str):
+    # Decode access token
+    user = decode_access_token(db=db, authorization=authorization)
+
+    return UserInfoResponse(user_id=user.user_id, email=user.email, nickname=user.nickname)

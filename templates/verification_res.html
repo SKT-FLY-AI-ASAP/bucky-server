@@ -4,69 +4,57 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>[ToyStory] 이메일 인증 완료</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-      }
-      .email-container {
-        background-color: #ffffff;
-        width: 100%;
-        max-width: 600px;
-        margin: 50px auto;
-        padding: 20px;
+  </head>
+  <body
+    style="
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    "
+    bgcolor="#f4f4f4"
+  >
+    <div
+      class="email-container"
+      style="
+        background-color: #fff;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 50px auto;
+        max-width: 600px;
+        padding: 20px;
         text-align: center;
-      }
-      .email-header {
-        margin-bottom: 20px;
-      }
-      .email-header img {
-        width: 50px;
-        height: 50px;
-      }
-      .email-body {
-        font-size: 16px;
-        color: #333333;
-        line-height: 1.6;
-      }
-      .email-body h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-      .email-button {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 16px;
-        color: #ffffff;
-        background-color: #007bff;
-        text-decoration: none;
-        border-radius: 5px;
-      }
-      .email-footer {
-        margin-top: 30px;
-        font-size: 12px;
-        color: #888888;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="email-container">
-      <div class="email-header">
-        <img src="./toystory_icon.png" alt="아이콘" />
+        width: 100%;
+      "
+      bgcolor="#ffffff"
+      align="center"
+      width="100%"
+    >
+      <div class="email-header" style="margin-bottom: 20px">
+        <img
+          src="{{icon}}"
+          alt="아이콘"
+          style="height: 50px; width: 50px"
+          height="50"
+          width="50"
+        />
       </div>
-      <div class="email-body">
-        <h1>이메일 인증이 완료되었습니다.</h1>
+      <div
+        class="email-body"
+        style="color: #333; font-size: 16px; line-height: 1.6"
+      >
+        <h1 style="font-size: 24px; margin-bottom: 20px">
+          이메일 인증이 완료되었습니다.
+        </h1>
         <p>인증 상태는 1시간 동안 유효합니다.</p>
         <p>감사합니다.</p>
       </div>
-      <div class="email-footer">
+      <div
+        class="email-footer"
+        style="color: #888; font-size: 12px; margin-top: 30px"
+      >
         <p>이 이메일은 자동으로 발송된 것입니다. 회신하지 마세요.</p>
-        <p>&copy; 2024 SKT FLY AI ASAP. All rights reserved.</p>
+        <p>© 2024 SKT FLY AI TOY-STORY. All rights reserved.</p>
       </div>
     </div>
   </body>

@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, Header
 from fastapi.responses import HTMLResponse
 from starlette import status
 
-from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account, refresh_token
+from .service import add_user, send_email, verify_link, validate_nickname, check_email_verification, login, logout, remove_account, refresh_token, get_user_info
 
 from core.database import get_db
 from sqlalchemy.orm import Session
-from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest, LogoutResponse
+from .schemas import EmailAuthRequest, NewUserRequest, NewUserResponse, TokenResponse, LoginRequest, LogoutResponse, UserInfoResponse
 from core.schemas import ResponseDto, DataResponseDto
 
 # Router
@@ -19,7 +19,7 @@ router = APIRouter(
 def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None):
     data = login(db, login_req=login_req)
 
-    return DataResponseDto(data=data, message='Created.')
+    return DataResponseDto(data=data)
 
 
 # Logout
@@ -27,7 +27,7 @@ def login_request(db: Session = Depends(get_db), login_req: LoginRequest = None)
 def login_request(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = logout(db, authorization=Authorization)
 
-    return DataResponseDto(data=data, message='OK.')
+    return DataResponseDto(data=data)
 
 
 # Request email verification link
@@ -65,7 +65,7 @@ def check_nickname(db: Session = Depends(get_db), nickname: str = None):
 def add_new_user(db: Session = Depends(get_db), new_user: NewUserRequest = None):
     res = add_user(db, new_user=new_user)
 
-    return DataResponseDto(data=res, message="Created.")
+    return DataResponseDto(data=res)
 
 
 # Remove user
@@ -81,4 +81,12 @@ def remove_user(db: Session = Depends(get_db), Authorization: str = Header(defau
 def refresh_tokens(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
     data = refresh_token(db=db, authorization=Authorization)
 
-    return DataResponseDto(data=data, message='Created.')
+    return DataResponseDto(data=data)
+
+
+# User info
+@router.get("/info", response_model=DataResponseDto[UserInfoResponse], status_code=status.HTTP_200_OK)
+def read_user_info(db: Session = Depends(get_db), Authorization: str = Header(default=None)):
+    data = get_user_info(db=db, authorization=Authorization)
+
+    return DataResponseDto(data=data)
